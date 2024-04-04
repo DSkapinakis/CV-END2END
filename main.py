@@ -16,12 +16,12 @@ class Prediction(BaseModel):
     filename: str
     contenttype: str
     prediction: float
-    likely_class: int
     
 # Define the main route
 @app.get('/')
 def root_route():
   return { 'error': 'Use POST /prediction instead of the root route!' }
+
 # Define the /prediction route
 @app.post('/prediction/', response_model=Prediction)
 async def prediction_route(file: UploadFile = File(...)):
@@ -45,20 +45,14 @@ async def prediction_route(file: UploadFile = File(...)):
     # Convert image into numpy format
     numpy_image = np.array(pil_image).reshape((input_shape[1], input_shape[2], input_shape[3]))
 
-    # Scale data (depending on your model)
-    numpy_image = numpy_image / 255
-
     # Generate prediction
-    prediction_array = np.array([numpy_image])
-    predictions = model.predict(prediction_array)
-    prediction = predictions[0]
-    likely_class = np.argmax(prediction)
+    predictions = model.predict(numpy_image)
+    prediction = predictions[0][0]
 
     return {
       'filename': file.filename,
       'contenttype': file.content_type,
       'prediction': prediction.tolist(),
-      'likely_class': likely_class
     }
   except:
     e = sys.exc_info()[1]
