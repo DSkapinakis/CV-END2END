@@ -42,7 +42,7 @@ async def prediction_route(file: UploadFile = File(...)):
         if pil_image.mode == 'RGBA':
             pil_image = pil_image.convert('RGB')
 
-        # Convert image into numpy format
+        # Expand the shape of the array (one sample)
         numpy_image = np.expand_dims(pil_image, axis=0)
 
         # Generate prediction
