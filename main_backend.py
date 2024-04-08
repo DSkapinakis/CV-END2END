@@ -7,6 +7,7 @@ from typing import List
 import io
 import numpy as np
 import sys
+import mimetypes
 
 model = load_model(r'C:/Users/dskapinakis/Documents/computer_vision_concrete/saved_models/cnn_cracks.keras')
 input_shape = model.layers[0].input_shape
@@ -26,10 +27,8 @@ def root_route():
 @app.post('/prediction', response_model=Prediction)
 async def prediction_route(file: UploadFile = File(...)):
 
-    # Ensure that the input is an image
-    if file.content_type.startswith('image/') is False:
-        raise HTTPException(status_code=400, detail=f'File \'{file.filename}\' is not an image.')
-    
+    content_type = mimetypes.guess_type(file.filename)
+
     try:
         # Read image contents
         contents = await file.read()
@@ -51,7 +50,7 @@ async def prediction_route(file: UploadFile = File(...)):
 
         return {
         'filename': file.filename,
-        'contenttype': file.content_type,
+        'contenttype': content_type[0],
         'prediction': prediction.tolist(),
         }
     except:
