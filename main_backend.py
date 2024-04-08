@@ -23,7 +23,7 @@ def root_route():
   return { 'error': 'Use POST /prediction instead of the root route!' }
 
 # Define the /prediction route
-@app.post('/prediction/', response_model=Prediction)
+@app.post('/prediction', response_model=Prediction)
 async def prediction_route(file: UploadFile = File(...)):
 
     # Ensure that the input is an image
